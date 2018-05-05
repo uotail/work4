@@ -1,11 +1,12 @@
 package com.lession.utils;
 
-
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 public class JedisPoolUtil {
+	/*public static LinkedList<Jedis> pool = (LinkedList<Jedis>)Collections.synchronizedCollection(new LinkedList<Jedis>());
+	*/
 	public static JedisPoolConfig config;
 	public static JedisPool jedisPool;
 	static {
@@ -18,7 +19,6 @@ public class JedisPoolUtil {
 			e.printStackTrace();
 		}
 	}
-	
 	public synchronized static Jedis getJedis() {
 		Jedis jedis=null;
 		try {
@@ -28,17 +28,5 @@ public class JedisPoolUtil {
 			e.printStackTrace();
 		}
 		return jedis;
-	}
-
-	public static void colseJedis(Jedis jedis) {
-		 if(jedis!=null){
-			 try {
-				 jedis.close();
-				 //jedisPool.returnResource(jedis);
-			 }catch (Exception e) {
-				e.printStackTrace();
-			}
-         }
-	}
-		
+	}	
 }

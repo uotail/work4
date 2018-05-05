@@ -7,17 +7,21 @@ import java.util.Set;
 import com.lession.model.Student;
 import com.lession.utils.JedisPoolUtil;
 import com.lession.utils.StudentUtil;
-
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Tuple;
 public class StudentDao {
-
+	/**
+	 * 分页列表
+	 * @param currentPage
+	 * @return
+	 */
 	public List<Student> studentList(String currentPage){
 		int cp = Integer.parseInt(currentPage);
 		List<Student> students = new ArrayList<>();
 		Jedis jedis = JedisPoolUtil.getJedis();
 		Set<Tuple> stus = jedis.zrevrangeByScoreWithScores("students", 100, 0, (cp-1)*10, 10);
-		for (Iterator iterator = stus.iterator(); iterator.hasNext();) {
+		jedis.close();
+		for (Iterator<Tuple> iterator = stus.iterator(); iterator.hasNext();) {
 			Tuple tuple = (Tuple) iterator.next();
 			String data = tuple.getElement();
 			double score = tuple.getScore();
@@ -27,27 +31,53 @@ public class StudentDao {
 		return students;
 		
 	}
+	/**
+	 * 添加
+	 * @param data
+	 * @param score
+	 */
 	public void studentAdd(String data, double score) {
 		Jedis jedis = JedisPoolUtil.getJedis();
     	jedis.zadd("students", score, data);
+    	jedis.close();
 		
 	}
+	/**
+	 * 根据score和ip找到对应的唯一学生数据
+	 * @param score
+	 * @param id
+	 * @return 返回student对象
+	 */
 	public Student findByScoreAndId(double score,String id) {
 		Student student = new Student();
 		Jedis jedis = JedisPoolUtil.getJedis();
 		Set<String> studentByScore = jedis.zrangeByScore("students", score, score);
+		jedis.close();
 		for (String str : studentByScore) {
 			if(id.equals(str.split(",")[0])) {
 				student = StudentUtil.dsToStudent(str, score);
 			}
 		}
 		return student;
-		
 	}
+	/**
+	 * 删除
+	 * @param data
+	 */
 	public void studentRem(String data) {
 		Jedis jedis = JedisPoolUtil.getJedis();
-		Long zrem = jedis.zrem("students", data);
-		System.out.println(zrem+"sa");
+		jedis.zrem("students", data);
+		jedis.close();
 	}
-	
+	/**
+	 * 根据条数返回总页数
+	 * @return
+	 */
+	public int studentSumPages() {
+		Jedis jedis = JedisPoolUtil.getJedis();
+		Long rows = jedis.zcard("students");
+		jedis.close();
+		int totalPage = (int) (rows%10==0 ? rows/10:rows/10+1);
+		return totalPage;
+	}
 }

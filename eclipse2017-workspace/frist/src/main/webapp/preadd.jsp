@@ -9,27 +9,22 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <script language="javascript" type="text/javascript" src="./My97DatePicker/WdatePicker.js"></script>
 <script type="text/javascript">
-function checkChange(){
-	if(document.getElementById("isImage").checked){
-		$("#hdtp").show();
-	}else{
-		$("#hdtp").hide();
-	}
-}
 function checkForm(){
 	var name=document.getElementById("name").value;
 	var birthday=document.getElementById("birthday").value;
 	var description=document.getElementById("description").value;
 	var score=document.getElementById("score").value;
-	var content=CKEDITOR.instances.content.getData();
-	if(naem==null||name==""){
+	if(name==null||name==""){
 		document.getElementById("error").innerHTML="姓名不能为空！";
 		return false;
 	}
 	if(birthday==null||birthday==""){
 		document.getElementById("error").innerHTML="出生日期不能为空！";
 		return false;
-	}
+		}else if(birthday.match()){
+			
+		}
+	
 	if(description==null||description==""){
 		document.getElementById("error").innerHTML="备注不能为空！";
 		return false;
@@ -37,9 +32,11 @@ function checkForm(){
 	if(score==null||score==""){
 		document.getElementById("error").innerHTML="分数不能为空！";
 		return false;
+	}else if(score<0||score>100){
+		document.getElementById("error").innerHTML="分数必须在0~100之间！";
+		return false;
 	}
 }
-
 </script>
 <title>Insert title here</title>
 </head>
@@ -56,7 +53,7 @@ function checkForm(){
 		</tr>
 			<tr>
 			<td>出生日期</td>
-			<td><input type="text" id ="b" name="birthday" id="birthday" value="${student.birthday }"></input><img onclick="WdatePicker({el:'b'})" src="./My97DatePicker/skin/datePicker.gif" width="16" height="22" align="absmiddle"></td>
+			<td><input type="text" name="birthday" id="birthday"  readonly="readonly" value="${student.birthday }"></input><img onclick="WdatePicker({el:'birthday'})" src="./My97DatePicker/skin/datePicker.gif" width="16" height="22" align="absmiddle"></td>
 		</tr>
 		<tr>
 			<td>备注</td>
@@ -64,7 +61,7 @@ function checkForm(){
 		</tr>
 		<tr>
 			<td>平均分</td>
-			<td><input type="text" name="score" id="score" value="${student.score }"></input></td>
+			<td><input type="text" name="score" id="score" value="<fmt:parseNumber value="${student.score}" type="number" integerOnly="true"/>" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/[^\d]/g,'')"></input></td>
 		</tr>
 	</table>
 	<input type="submit" value="提交"></input>

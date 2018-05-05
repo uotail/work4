@@ -7,14 +7,40 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script type="text/javascript">
+	function jumpPage() {
+		var jpage = document.getElementById("jp").value;
+		if(0<parseInt(jpage)&&parseInt(jpage)<=${lastPage}){
+			window.location.href="student?action=list&currentPage="+jpage;
+		}else{
+			document.getElementById("error").innerHTML="当前只有${lastPage}页,请输入大于0小于${lastPage}的整数"
+		}
+	}
+	
+	function checkPageUp() {
+		if(parseInt(${currentPage})>1){
+			return true
+		}else{
+			return false
+		}
+	}
+	
+	function checkPageDown() {
+		if(parseInt(${currentPage})<parseInt(${lastPage})){
+			return true
+		}else{
+			return false
+		}
+	}
+	
+</script>
 <title>Insert title here</title>
 </head>
 <body>
-<div class="studentlist">
+<div class="studentlist" align="center">
 
 	<table class="table table-hover table-bordered">
 			<tr>
-				<th><input type="checkbox" id="checkedAll"/></th>
 				<th>序号</th>
 				<th>学生ID</th>
 				<th width="60px">姓名</th>
@@ -26,13 +52,12 @@
 			</tr>
 			 <c:forEach items="${studentList }" var="sl" varStatus="status">
 				<tr>
-					<td><input type="checkbox" name="is" value="${sl.id}"/></td>
 					<td align="center">${status.index+1 }</td>
 					<td align="center"><c:out value="${sl.id}"/></td>
 					<td align="center"><c:out value="${sl.name}"/></td>
 					<td align="center"><c:out value="${sl.birthday}"/></td>
-					<td align="center">${fn:substring(sl.description, 0, 5)}</td>
-					<td align="center"><c:out value="${sl.score}"/></td>
+					<td align="center" title="${sl.description}">${fn:substring(sl.description, 0, 5)}</td>
+					<td align="center"><fmt:parseNumber value="${sl.score}" type="number" integerOnly="true"/></td>
 					<td>
 						<button class="btn" type="button" onclick="javascript:window.location.href='student?action=preadd&id=${sl.id}&score=${sl.score}'">修改</button>&nbsp;
 						<button class="btn" type="button" onclick="javascript:window.location.href='${pageContext.request.contextPath }/student?action=rem&data=${sl.id },${sl.name },${sl.birthday },${sl.description }'">删除</button>
@@ -41,8 +66,16 @@
 			</c:forEach>
 		</table>
 </div>
-<div>
-	<a href="${pageContext.request.contextPath} /student?action=list&currentPage=${currentPage}"></a>
+<div align="center">
+	<a href="${pageContext.request.contextPath}/student?action=list&currentPage=1" onclick="return checkPageUp()">首页</a>
+	<a href="${pageContext.request.contextPath}/student?action=list&currentPage=${currentPage-1}" onclick="return checkPageUp()">上一页</a>
+	<a href="${pageContext.request.contextPath}/student?action=list&currentPage=${currentPage}">第${currentPage}页</a>
+	<a href="${pageContext.request.contextPath}/student?action=list&currentPage=${currentPage+1}" onclick="return checkPageDown()">下一页</a>
+	<a href="${pageContext.request.contextPath}/student?action=list&currentPage=${lastPage}" onclick="return checkPageDown()">最后一页</a>
+	
+	<button onclick="jumpPage()">跳转到指定页</button>
+	<input id="jp" type="text" onkeyup="this.value=this.value.replace(/\D/g,'')" s name="f_order" value="1" style="width:20px;"/>
 </div>
+	<span id="error" style="color:red;position: absolute;right:300px"></span>
 </body>
 </html>
